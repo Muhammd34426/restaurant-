@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember & Spice — Desi BBQ · Fast Food · Continental</title>
+<meta name="description" content="Ember & Spice — Premium multi-cuisine dining experience in Karachi. Desi BBQ, Fast Food, and Continental cuisine with online ordering and table reservations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-dark: #9B7A2E;
+  --ember: #E05C2A;
+  --charcoal: #0D0D0D;
+  --charcoal-2: #141414;
+  --charcoal-3: #1C1C1C;
+  --charcoal-4: #252525;
+  --surface: #1A1A1A;
+  --surface-2: #222222;
+  --text: #F2ECD9;
+  --text-muted: #A09070;
+  --text-dim: #6B5B45;
+  --border: rgba(201,168,76,0.15);
+  --border-strong: rgba(201,168,76,0.35);
+  --font-display: 'Cinzel', serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-body: 'Outfit', sans-serif;
+  --radius: 4px;
+  --radius-lg: 12px;
+  --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+  --shadow-gold: 0 0 40px rgba(201,168,76,0.12);
+  --shadow-deep: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body { background: var(--charcoal); color: var(--text); font-family: var(--font-body); font-weight: 300; line-height: 1.65; overflow-x: hidden; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; outline: none; font-family: var(--font-body); }
+input, select, textarea { font-family: var(--font-body); outline: none; }
+ul { list-style: none; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--charcoal); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+/* ===== NOISE TEXTURE OVERLAY ===== */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.display { font-family: var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; }
+.serif { font-family: var(--font-serif); }
+.gold { color: var(--gold); }
+.ember { color: var(--ember); }
+
+/* ===== LAYOUT HELPERS ===== */
+.container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 100px 0; }
+.section-label {
+  font-family: var(--font-body); font-size: 0.7rem; font-weight: 600;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 12px;
+}
+.section-label::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+.section-title { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 300; line-height: 1.15; margin-bottom: 16px; }
+.section-subtitle { color: var(--text-muted); font-size: 1rem; font-weight: 300; max-width: 480px; }
+.divider { width: 60px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); margin: 24px 0; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px; font-size: 0.8rem; font-weight: 500;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  border-radius: var(--radius); transition: var(--transition);
+  position: relative; overflow: hidden;
+}
+.btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.05); opacity: 0;
+  transition: var(--transition);
+}
+.btn:hover::after { opacity: 1; }
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+  color: var(--charcoal); font-weight: 600;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.5); }
+.btn-outline {
+  border: 1px solid var(--border-strong); color: var(--text);
+  background: transparent;
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+.btn-ghost {
+  background: rgba(201,168,76,0.08); color: var(--gold);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: rgba(201,168,76,0.15); }
+.btn-sm { padding: 10px 20px; font-size: 0.72rem; }
+
+/* ===== NAVIGATION ===== */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 20px 0; transition: var(--transition);
+}
+#navbar.scrolled {
+  background: rgba(13,13,13,0.95); backdrop-filter: blur(20px);
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; flex-direction: column; }
+.nav-logo-main { font-family: var(--font-display); font-size: 1.3rem; color: var(--gold); letter-spacing: 0.12em; }
+.nav-logo-sub { font-family: var(--font-serif); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; font-style: italic; }
+.nav-links { display: flex; align-items: center; gap: 36px; }
+.nav-links a { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); transition: var(--transition); font-weight: 400; }
+.nav-links a:hover { color: var(--gold); }
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+.cart-btn {
+  position: relative; background: rgba(201,168,76,0.1);
+  border: 1px solid var(--border); color: var(--gold);
+  padding: 10px 20px; border-radius: var(--radius);
+  font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+  transition: var(--transition); display: flex; align-items: center; gap: 8px;
+}
+.cart-btn:hover { background: rgba(201,168,76,0.2); }
+.cart-count {
+  position: absolute; top: -6px; right: -6px;
+  background: var(--ember); color: #fff; font-size: 0.65rem;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: 600;
+  display: none;
+}
+.cart-count.visible { display: flex; }
+.hamburger { display: none; flex-direction: column; gap: 5px; background: none; padding: 8px; }
+.hamburger span { width: 24px; height: 1.5px; background: var(--text); transition: var(--transition); }
+
+/* ===== MOBILE NAV ===== */
+.mobile-nav {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(13,13,13,0.98); backdrop-filter: blur(20px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+  transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.mobile-nav.open { transform: translateX(0); }
+.mobile-nav a { font-family: var(--font-serif); font-size: 2rem; color: var(--text); transition: var(--transition); }
+.mobile-nav a:hover { color: var(--gold); }
+.mobile-close { position: absolute; top: 24px; right: 24px; background: none; font-size: 1.5rem; color: var(--text-muted); }
+
+/* ===== HERO SECTION ===== */
+#hero {
+  min-height: 100vh; position: relative;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(224,92,42,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.06) 0%, transparent 50%),
+    linear-gradient(to bottom, var(--charcoal) 0%, var(--charcoal-2) 100%);
+}
+.hero-grid {
+  position: absolute; inset: 0; opacity: 0.04;
+  background-image: 
+    linear-gradient(var(--gold) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gold) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-image-panel {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
+  overflow: hidden;
+}
+.hero-image-panel::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 200px;
+  background: linear-gradient(90deg, var(--charcoal), transparent); z-index: 1;
+}
+.hero-image-panel::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(13,13,13,0.3) 0%, rgba(13,13,13,0.1) 50%, rgba(13,13,13,0.4) 100%);
+}
+.hero-slider { width: 100%; height: 100%; position: relative; }
+.hero-slide {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: opacity 1.2s ease;
+  opacity: 0;
+}
+.hero-slide.active { opacity: 1; }
+.hero-slide:nth-child(1) { background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80'); }
+.hero-slide:nth-child(2) { background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80'); }
+.hero-slide:nth-child(3) { background-image: url('https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80'); }
+.hero-content {
+  position: relative; z-index: 2;
+  max-width: 600px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border-strong); padding: 8px 20px;
+  border-radius: 100px; margin-bottom: 32px;
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); background: rgba(201,168,76,0.05);
+  animation: fadeInDown 0.8s ease 0.2s both;
+}
+.hero-badge span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+.hero-title {
+  font-family: var(--font-display); font-size: clamp(3rem, 7vw, 6.5rem);
+  line-height: 0.95; letter-spacing: 0.03em; margin-bottom: 8px;
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+.hero-title-accent {
+  font-family: var(--font-serif); font-size: clamp(1.8rem, 4vw, 3.8rem);
+  font-weight: 300; font-style: italic; color: var(--gold-light);
+  display: block; margin-top: 8px;
+  animation: fadeInUp 0.8s ease 0.5s both;
+}
+.hero-tagline {
+  font-family: var(--font-serif); font-size: clamp(1rem, 1.5vw, 1.2rem);
+  color: var(--text-muted); font-style: italic; margin: 24px 0 40px;
+  animation: fadeInUp 0.8s ease 0.6s both;
+}
+.hero-cta {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease 0.7s both;
+}
+.hero-stats {
+  position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 60px; z-index: 2;
+  animation: fadeInUp 0.8s ease 0.9s both;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num { font-family: var(--font-display); font-size: 2rem; color: var(--gold); line-height: 1; }
+.hero-stat-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; }
+.scroll-indicator {
+  position: absolute; bottom: 60px; right: 60px; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase;
+}
+.scroll-line { width: 1px; height: 60px; background: linear-gradient(to bottom, var(--gold-dark), transparent); animation: scrollAnim 2s ease infinite; }
+
+/* ===== MARQUEE ===== */
+.marquee-section {
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-dark));
+  padding: 14px 0; overflow: hidden;
+}
+.marquee-track { display: flex; gap: 0; animation: marquee 25s linear infinite; white-space: nowrap; }
+.marquee-item { padding: 0 40px; font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.15em; color: var(--charcoal); display: flex; align-items: center; gap: 16px; }
+.marquee-item .dot { width: 5px; height: 5px; background: var(--charcoal); border-radius: 50%; opacity: 0.5; }
+
+/* ===== MENU SECTION ===== */
+#menu { background: var(--charcoal-2); }
+.menu-tabs {
+  display: flex; gap: 4px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 6px;
+  margin-bottom: 60px; width: fit-content;
+}
+.menu-tab {
+  padding: 12px 28px; border-radius: 8px;
+  font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted); background: transparent;
+  transition: var(--transition); font-weight: 400;
+}
+.menu-tab.active { background: var(--gold); color: var(--charcoal); font-weight: 600; }
+.menu-tab:hover:not(.active) { color: var(--text); }
+.menu-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+.menu-panel { display: none; }
+.menu-panel.active { display: block; }
+.menu-card {
+  background: var(--charcoal-3); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  transition: var(--transition); cursor: pointer;
+  position: relative;
+}
+.menu-card:hover { transform: translateY(-6px); border-color: var(--border-strong); box-shadow: var(--shadow-gold); }
+.menu-card-img {
+  height: 200px; overflow: hidden; position: relative;
+}
+.menu-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.menu-card:hover .menu-card-img img { transform: scale(1.08); }
+.menu-card-badge {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--ember); color: #fff;
+  font-size: 0.65rem; padding: 4px 10px; border-radius: 100px;
+  letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
+}
+.menu-card-body { padding: 20px; }
+.menu-card-title { font-family: var(--font-serif); font-size: 1.3rem; margin-bottom: 6px; }
+.menu-card-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+.menu-card-footer { display: flex; align-items: center; justify-content: space-between; }
+.menu-card-price { font-family: var(--font-display); font-size: 1.1rem; color: var(--gold); }
+.menu-card-price small { font-family: var(--font-body); font-size: 0.7rem; color: var(--text-muted); font-weight: 300; }
+.add-to-cart-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(201,168,76,0.1); border: 1px solid var(--border-strong);
+  color: var(--gold); font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.add-to-cart-btn:hover { background: var(--gold); color: var(--charcoal); transform: rotate(90deg); }
+.add-to-cart-btn.added { background: var(--ember); border-color: var(--ember); color: #fff; }
+
+/* ===== ORDERING SECTION ===== */
+#order { background: var(--charcoal); }
+.order-type-selector {
+  display: flex; gap: 16px; margin-bottom: 40px; flex-wrap: wrap;
+}
+.order-type-btn {
+  flex: 1; min-width: 200px;
+  padding: 24px; border-radius: var(--radius-lg);
+  border: 2px solid var(--border); background: var(--charcoal-3);
+  transition: var(--transition); text-align: left;
+}
+.order-type-btn.selected { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+.order-type-btn:hover { border-color: var(--border-strong); }
+.order-type-icon { font-size: 2rem; margin-bottom: 12px; }
+.order-type-title { font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 4px; }
+.order-type-desc { font-size: 0.8rem; color: var(--text-muted); }
+.order-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+.form-input, .form-select, .form-textarea {
+  background: var(--charcoal-3); border: 1px solid var(--border);
+  color: var(--text); padding: 14px 18px; border-radius: var(--radius);
+  font-size: 0.9rem; transition: var(--transition); width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+.form-input::placeholder { color: var(--text-dim); }
+.form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+.form-select option { background: var(--charcoal-3); }
+.form-textarea { resize: vertical; min-height: 100px; }
+.table-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 8px; }
+.table-btn {
+  padding: 10px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--charcoal-3);
+  color: var(--text-muted); font-size: 0.8rem; transition: var(--transition);
+}
+.table-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.1); }
+.table-btn:hover:not(.selected) { border-color: var(--border-strong); color: var(--text); }
+.table-btn.occupied { opacity: 0.3; cursor: not-allowed; }
+
+/* ===== CART SIDEBAR ===== */
+#cart-sidebar {
+  position: fixed; right: 0; top: 0; bottom: 0; width: 400px; max-width: 100vw;
+  background: var(--charcoal-2); border-left: 1px solid var(--border);
+  z-index: 1001; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column;
+  box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+}
+#cart-sidebar.open { transform: translateX(0); }
+.cart-header { padding: 28px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.cart-header h3 { font-family: var(--font-serif); font-size: 1.5rem; }
+.cart-close { background: rgba(255,255,255,0.05); border: none; color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.cart-close:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+.cart-items { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.cart-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.cart-empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.3; }
+.cart-item { display: flex; gap: 14px; padding: 14px; background: var(--charcoal-3); border-radius: var(--radius); border: 1px solid var(--border); }
+.cart-item-img { width: 60px; height: 60px; border-radius: var(--radius); object-fit: cover; flex-shrink: 0; }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-family: var(--font-serif); font-size: 1rem; margin-bottom: 4px; }
+.cart-item-price { font-size: 0.85rem; color: var(--gold); }
+.cart-item-qty { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.qty-btn { width: 24px; height: 24px; border-radius: 50%; background: rgba(201,168,76,0.1); border: 1px solid var(--border); color: var(--gold); font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.qty-btn:hover { background: var(--gold); color: var(--charcoal); }
+.qty-num { font-size: 0.9rem; min-width: 20px; text-align: center; }
+.cart-remove { margin-left: auto; color: var(--text-dim); font-size: 0.75rem; transition: var(--transition); background: none; padding: 4px 8px; border-radius: 4px; }
+.cart-remove:hover { color: var(--ember); background: rgba(224,92,42,0.1); }
+.cart-footer { padding: 20px 24px; border-top: 1px solid var(--border); }
+.cart-coupon { display: flex; gap: 8px; margin-bottom: 16px; }
+.coupon-input { flex: 1; background: var(--charcoal-3); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: var(--radius); font-size: 0.85rem; }
+.coupon-input:focus { border-color: var(--gold); }
+.coupon-input::placeholder { color: var(--text-dim); }
+.cart-subtotal { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); }
+.cart-total { display: flex; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); margin-bottom: 16px; }
+.cart-total-label { font-family: var(--font-serif); font-size: 1.1rem; }
+.cart-total-amount { font-family: var(--font-display); font-size: 1.3rem; color: var(--gold); }
+.cart-discount { display: flex; justify-content: space-between; font-size: 0.82rem; color: #4ade80; margin-bottom: 8px; }
+
+/* ===== ORDER STATUS ===== */
+.order-status-bar {
+  display: none; background: var(--charcoal-3); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px; margin-top: 20px;
+}
+.order-status-bar.visible { display: block; }
+.status-title { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+.status-steps { display: flex; align-items: center; gap: 0; }
+.status-step { flex: 1; text-align: center; position: relative; }
+.status-step::before {
+  content: ''; position: absolute; top: 14px; left: 50%; right: -50%;
+  height: 2px; background: var(--border);
+}
+.status-step:last-child::before { display: none; }
+.status-step.completed::before { background: var(--gold); }
+.status-dot {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--charcoal-4);
+  border: 2px solid var(--border); margin: 0 auto 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; position: relative; z-index: 1; transition: var(--transition);
+}
+.status-step.completed .status-dot { background: var(--gold); border-color: var(--gold); color: var(--charcoal); }
+.status-step.active .status-dot { border-color: var(--gold); animation: pulseGold 1.5s infinite; }
+.status-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.08em; }
+.status-step.completed .status-label, .status-step.active .status-label { color: var(--gold); }
+
+/* ===== PAYMENT SECTION ===== */
+#payment { background: var(--charcoal-2); }
+.payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+.payment-method {
+  padding: 20px; border: 2px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--charcoal-3); transition: var(--transition); cursor: pointer;
+  text-align: center;
+}
+.payment-method.selected { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+.payment-method:hover { border-color: var(--border-strong); }
+.payment-icon { font-size: 2rem; margin-bottom: 10px; }
+.payment-name { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+.payment-method.selected .payment-name { color: var(--gold); }
+.card-details { background: var(--charcoal-3); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; }
+.card-visual {
+  height: 160px; border-radius: 12px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  padding: 20px 24px; margin-bottom: 20px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.card-visual::before {
+  content: ''; position: absolute; right: -30px; top: -30px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(201,168,76,0.1);
+}
+.card-chip { width: 36px; height: 28px; background: var(--gold); border-radius: 4px; }
+.card-number { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.8); }
+.card-bottom { display: flex; justify-content: space-between; }
+.card-info-label { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+.card-info-value { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+.security-badge { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; }
+.security-badge::before { content: '🔒'; }
+.wallet-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wallet-option {
+  padding: 20px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--charcoal-3); display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: var(--transition);
+}
+.wallet-option:hover { border-color: var(--gold); }
+.wallet-logo { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; }
+.wallet-easypaisa .wallet-logo { background: #00A651; color: white; }
+.wallet-jazzcash .wallet-logo { background: #E32729; color: white; }
+
+/* ===== RESERVATION SECTION ===== */
+#reservation { background: var(--charcoal); position: relative; overflow: hidden; }
+#reservation::before {
+  content: ''; position: absolute; right: -100px; top: 50%; transform: translateY(-50%);
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%);
+}
+.reservation-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: center; }
+.reservation-visual { position: relative; }
+.reservation-img-wrap {
+  border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-deep);
+  border: 1px solid var(--border);
+}
+.reservation-img-wrap img { width: 100%; height: 500px; object-fit: cover; }
+.reservation-overlay {
+  position: absolute; bottom: 24px; left: -24px;
+  background: rgba(13,13,13,0.95); border: 1px solid var(--border-strong);
+  padding: 20px 24px; border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px); min-width: 200px;
+}
+.reservation-overlay-title { font-family: var(--font-serif); font-size: 0.9rem; color: var(--gold); margin-bottom: 8px; }
+.reservation-overlay-detail { font-size: 0.8rem; color: var(--text-muted); }
+.guest-selector { display: flex; align-items: center; gap: 20px; }
+.guest-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(201,168,76,0.1); border: 1px solid var(--border-strong);
+  color: var(--gold); font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.guest-btn:hover { background: var(--gold); color: var(--charcoal); }
+.guest-count { font-family: var(--font-display); font-size: 2rem; color: var(--gold); min-width: 40px; text-align: center; }
+
+/* ===== ABOUT SECTION ===== */
+#about { background: var(--charcoal-2); }
+.about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 80px; align-items: center; }
+.about-images { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.about-img-main { grid-column: 1 / -1; border-radius: var(--radius-lg); overflow: hidden; height: 280px; }
+.about-img-main img { width: 100%; height: 100%; object-fit: cover; }
+.about-img-sm { border-radius: var(--radius); overflow: hidden; height: 160px; }
+.about-img-sm img { width: 100%; height: 100%; object-fit: cover; }
+.about-features { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+.about-feature { padding: 16px; background: rgba(201,168,76,0.04); border: 1px solid var(--border); border-radius: var(--radius); }
+.about-feature-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.about-feature-title { font-family: var(--font-serif); font-size: 0.95rem; margin-bottom: 4px; }
+.about-feature-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ===== REVIEWS SECTION ===== */
+#reviews { background: var(--charcoal); }
+.reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+.review-card {
+  background: var(--charcoal-3); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px;
+  transition: var(--transition); position: relative;
+}
+.review-card::before {
+  content: '"'; font-family: var(--font-serif); font-size: 6rem; 
+  color: var(--gold); opacity: 0.08; position: absolute;
+  top: 10px; right: 20px; line-height: 1;
+}
+.review-card:hover { border-color: var(--border-strong); transform: translateY(-4px); }
+.review-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 16px; letter-spacing: 2px; }
+.review-text { font-family: var(--font-serif); font-size: 1rem; font-style: italic; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px; }
+.reviewer { display: flex; align-items: center; gap: 12px; }
+.reviewer-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--ember));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 0.9rem; color: var(--charcoal);
+  font-weight: 600;
+}
+.reviewer-name { font-weight: 500; font-size: 0.9rem; }
+.reviewer-date { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+.review-platform { margin-left: auto; font-size: 0.7rem; color: var(--text-dim); background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 100px; }
+
+/* ===== LOCATION SECTION ===== */
+#location { background: var(--charcoal-2); }
+.location-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 60px; align-items: start; }
+.location-info { display: flex; flex-direction: column; gap: 28px; }
+.location-detail { display: flex; gap: 16px; }
+.location-icon { width: 44px; height: 44px; border-radius: var(--radius); background: rgba(201,168,76,0.1); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.location-detail-text strong { display: block; font-size: 0.85rem; color: var(--text); margin-bottom: 4px; }
+.location-detail-text span { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+.map-container {
+  border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--border); height: 400px;
+  position: relative;
+}
+.map-placeholder {
+  width: 100%; height: 100%; background: var(--charcoal-3);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px;
+}
+.map-placeholder iframe { width: 100%; height: 100%; border: none; }
+.whatsapp-float {
+  position: fixed; bottom: 28px; right: 28px; z-index: 500;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #25D366; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+  transition: var(--transition); animation: float 3s ease infinite;
+  text-decoration: none;
+}
+.whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(37,211,102,0.6); }
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--charcoal); border-top: 1px solid var(--border);
+  padding: 80px 0 32px;
+}
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 60px; margin-bottom: 60px; }
+.footer-brand-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin: 16px 0 24px; }
+.social-links { display: flex; gap: 10px; }
+.social-link {
+  width: 38px; height: 38px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--charcoal-3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; color: var(--text-muted); transition: var(--transition);
+}
+.social-link:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+.footer-col-title { font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 20px; }
+.footer-links { display: flex; flex-direction: column; gap: 12px; }
+.footer-links a { font-size: 0.85rem; color: var(--text-muted); transition: var(--transition); }
+.footer-links a:hover { color: var(--gold); padding-left: 4px; }
+.newsletter-form { display: flex; flex-direction: column; gap: 10px; }
+.newsletter-input { background: var(--charcoal-3); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: var(--radius); font-size: 0.85rem; }
+.newsletter-input:focus { border-color: var(--gold); outline: none; }
+.newsletter-input::placeholder { color: var(--text-dim); }
+.footer-bottom { padding-top: 32px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.footer-copy { font-size: 0.78rem; color: var(--text-dim); }
+.footer-made { font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+.footer-made span { color: var(--ember); }
+
+/* ===== LOYALTY BADGE ===== */
+.loyalty-banner {
+  background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.03));
+  border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
+  padding: 20px 24px; display: flex; align-items: center; gap: 16px;
+  margin-bottom: 32px;
+}
+.loyalty-icon { font-size: 2rem; }
+.loyalty-title { font-family: var(--font-serif); font-size: 1rem; margin-bottom: 4px; }
+.loyalty-desc { font-size: 0.8rem; color: var(--text-muted); }
+.loyalty-points { margin-left: auto; text-align: right; }
+.loyalty-pts-num { font-family: var(--font-display); font-size: 1.8rem; color: var(--gold); }
+.loyalty-pts-label { font-size: 0.7rem; color: var(--text-muted); }
+
+/* ===== TOAST NOTIFICATION ===== */
+#toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--charcoal-3); border: 1px solid var(--border-strong);
+  padding: 14px 24px; border-radius: 100px; z-index: 2000;
+  font-size: 0.85rem; display: flex; align-items: center; gap: 10px;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: var(--shadow-deep); white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+.toast-icon { color: var(--gold); }
+
+/* ===== OVERLAY ===== */
+#overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+#overlay.visible { opacity: 1; pointer-events: all; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+@keyframes scrollAnim { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.3); } }
+@keyframes pulseGold { 0%,100% { box-shadow:0 0 0 0 rgba(201,168,76,0.4); } 50% { box-shadow:0 0 0 8px rgba(201,168,76,0); } }
+@keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+
+/* ===== SCROLL ANIMATIONS ===== */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.revealed { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal-left.revealed { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal-right.revealed { opacity: 1; transform: translateX(0); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .hero-image-panel { width: 45%; }
+  .about-grid, .reservation-grid, .location-grid { grid-template-columns: 1fr; gap: 48px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+@media (max-width: 768px) {
+  .section { padding: 72px 0; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .hero-image-panel { display: none; }
+  .hero-stats { gap: 32px; }
+  .menu-tabs { flex-wrap: wrap; width: 100%; }
+  .menu-tab { flex: 1; text-align: center; }
+  .order-form-grid { grid-template-columns: 1fr; }
+  .payment-methods { grid-template-columns: 1fr; gap: 10px; }
+  .payment-method { display: flex; gap: 12px; text-align: left; }
+  .payment-icon { margin-bottom: 0; }
+  .table-grid { grid-template-columns: repeat(4, 1fr); }
+  .about-images { grid-template-columns: 1fr; }
+  .about-img-main { grid-column: auto; }
+  .wallet-options { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  #cart-sidebar { width: 100%; }
+  .hero-stats { display: none; }
+  .scroll-indicator { display: none; }
+  .loyalty-banner { flex-wrap: wrap; }
+  .loyalty-points { margin-left: 0; }
+  .reservation-overlay { display: none; }
+}
+@media (max-width: 480px) {
+  .hero-cta { flex-direction: column; }
+  .menu-tabs { gap: 2px; }
+  .menu-tab { padding: 10px 14px; font-size: 0.7rem; }
+  .order-type-selector { flex-direction: column; }
+  .payment-methods { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo">
+        <span class="nav-logo-main">EMBER & SPICE</span>
+        <span class="nav-logo-sub">Desi BBQ · Fast Food · Continental</span>
+      </a>
+      <div class="nav-links">
+        <a href="#menu">Menu</a>
+        <a href="#order">Order</a>
+        <a href="#reservation">Reserve</a>
+        <a href="#about">About</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#location">Location</a>
+      </div>
+      <div class="nav-actions">
+        <button class="cart-btn" onclick="toggleCart()">
+          <span>🛒</span> Cart
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+        <button class="hamburger" id="hamburger" onclick="toggleMobileNav()">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-close" onclick="toggleMobileNav()">✕</button>
+  <a href="#menu" onclick="toggleMobileNav()">Menu</a>
+  <a href="#order" onclick="toggleMobileNav()">Order</a>
+  <a href="#reservation" onclick="toggleMobileNav()">Reserve</a>
+  <a href="#about" onclick="toggleMobileNav()">About</a>
+  <a href="#reviews" onclick="toggleMobileNav()">Reviews</a>
+  <a href="#location" onclick="toggleMobileNav()">Location</a>
+</div>
+
+<!-- CART SIDEBAR -->
+<div id="cart-sidebar">
+  <div class="cart-header">
+    <h3 class="serif">Your Order</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list">
+    <div class="cart-empty" id="cart-empty">
+      <div class="cart-empty-icon">🍽️</div>
+      <p style="font-family:var(--font-serif);font-size:1.1rem;margin-bottom:8px;">Your cart is empty</p>
+      <p style="font-size:0.82rem;color:var(--text-dim)">Add some delicious items!</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cart-footer" style="display:none;">
+    <div class="cart-coupon">
+      <input class="coupon-input" id="coupon-input" type="text" placeholder="Coupon code (try: EMBER20)">
+      <button class="btn btn-ghost btn-sm" onclick="applyCoupon()">Apply</button>
+    </div>
+    <div class="cart-discount" id="cart-discount" style="display:none;">
+      <span>Discount (20%)</span><span id="discount-amount">-₨ 0</span>
+    </div>
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-subtotal-val">₨ 0</span></div>
+    <div class="cart-subtotal"><span>Delivery</span><span style="color:#4ade80">Free</span></div>
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-amount" id="cart-total-val">₨ 0</span>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="scrollToPayment()">
+      Proceed to Checkout →
+    </button>
+    <div class="order-status-bar" id="order-status">
+      <div class="status-title">Order Status</div>
+      <div class="status-steps">
+        <div class="status-step" id="step-received">
+          <div class="status-dot">✓</div>
+          <div class="status-label">Received</div>
+        </div>
+        <div class="status-step" id="step-preparing">
+          <div class="status-dot">👨‍🍳</div>
+          <div class="status-label">Preparing</div>
+        </div>
+        <div class="status-step" id="step-ready">
+          <div class="status-dot">🎉</div>
+          <div class="status-label">Ready</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay" onclick="closeCart()"></div>
+
+<!-- TOAST -->
+<div id="toast"><span class="toast-icon">✓</span> <span id="toast-msg">Added to cart!</span></div>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/923001234567?text=Hi%2C%20I'd%20like%20to%20place%20an%20order!" class="whatsapp-float" target="_blank" title="Chat on WhatsApp">💬</a>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-image-panel">
+    <div class="hero-slider">
+      <div class="hero-slide active"></div>
+      <div class="hero-slide"></div>
+      <div class="hero-slide"></div>
+    </div>
+  </div>
+  <div class="container" style="position:relative;z-index:2;padding-top:100px;">
+    <div class="hero-content">
+      <div class="hero-badge"><span></span> Now Open · Karachi</div>
+      <h1 class="hero-title display">
+        EMBER<br>&amp; SPICE
+        <span class="hero-title-accent">Where Flavor Meets Fire</span>
+      </h1>
+      <p class="hero-tagline serif">Authentic Desi BBQ · Gourmet Fast Food · Continental Elegance</p>
+      <div class="hero-cta">
+        <button class="btn btn-gold" onclick="document.getElementById('order').scrollIntoView({behavior:'smooth'})">
+          🔥 Order Now
+        </button>
+        <button class="btn btn-outline" onclick="document.getElementById('reservation').scrollIntoView({behavior:'smooth'})">
+          📅 Book a Table
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">12+</div>
+      <div class="hero-stat-label">Years of Excellence</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">200+</div>
+      <div class="hero-stat-label">Menu Items</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">50K+</div>
+      <div class="hero-stat-label">Happy Guests</div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marquee">
+    <div class="marquee-item">Desi BBQ <span class="dot"></span></div>
+    <div class="marquee-item">Seekh Kebabs <span class="dot"></span></div>
+    <div class="marquee-item">Charcoal Grills <span class="dot"></span></div>
+    <div class="marquee-item">Continental Cuisine <span class="dot"></span></div>
+    <div class="marquee-item">Gourmet Burgers <span class="dot"></span></div>
+    <div class="marquee-item">Fresh Drinks <span class="dot"></span></div>
+    <div class="marquee-item">Family Deals <span class="dot"></span></div>
+    <div class="marquee-item">Free Delivery <span class="dot"></span></div>
+    <div class="marquee-item">Desi BBQ <span class="dot"></span></div>
+    <div class="marquee-item">Seekh Kebabs <span class="dot"></span></div>
+    <div class="marquee-item">Charcoal Grills <span class="dot"></span></div>
+    <div class="marquee-item">Continental Cuisine <span class="dot"></span></div>
+    <div class="marquee-item">Gourmet Burgers <span class="dot"></span></div>
+    <div class="marquee-item">Fresh Drinks <span class="dot"></span></div>
+    <div class="marquee-item">Family Deals <span class="dot"></span></div>
+    <div class="marquee-item">Free Delivery <span class="dot"></span></div>
+  </div>
+</div>
+
+<!-- ===== MENU ===== -->
+<section id="menu" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Our Specialties</div>
+      <h2 class="section-title">Curated with <span class="gold serif" style="font-style:italic">Passion</span></h2>
+      <p class="section-subtitle">From smoky Desi BBQ to refined continental plates — every dish tells a story.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="reveal">
+      <div class="menu-tabs">
+        <button class="menu-tab active" onclick="switchTab('bbq',this)">🔥 BBQ</button>
+        <button class="menu-tab" onclick="switchTab('fastfood',this)">🍔 Fast Food</button>
+        <button class="menu-tab" onclick="switchTab('continental',this)">🍝 Continental</button>
+        <button class="menu-tab" onclick="switchTab('drinks',this)">🥤 Drinks</button>
+        <button class="menu-tab" onclick="switchTab('deals',this)">⭐ Deals</button>
+      </div>
+    </div>
+
+    <!-- BBQ -->
+    <div class="menu-panel active" id="panel-bbq">
+      <div class="menu-grid">
+        <div class="menu-card reveal" onclick="addToCart('Seekh Kebab Platter','1,850','https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=70" alt="Seekh Kebab" loading="lazy"><div class="menu-card-badge">Bestseller</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Seekh Kebab Platter</div>
+            <div class="menu-card-desc">Juicy minced beef kebabs infused with aromatic spices, served with mint chutney and naan.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 1,850<small>/platter</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Charcoal Tikka','2,200','https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=70" alt="Tikka" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Charcoal Chicken Tikka</div>
+            <div class="menu-card-desc">Tender chicken marinated in saffron-yogurt blend, slow-grilled over premium charcoal.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 2,200<small>/kg</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Mutton Boti','2,800','https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=70" alt="Mutton Boti" loading="lazy"><div class="menu-card-badge">Chef's Pick</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Mutton Boti Masala</div>
+            <div class="menu-card-desc">Slow-cooked mutton chunks in rich masala with hand-ground spices. A heritage recipe.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 2,800<small>/kg</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('BBQ Mix Grill','3,500','https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70" alt="Mix Grill" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">BBQ Mix Grill Feast</div>
+            <div class="menu-card-desc">A generous platter of tikka, kebabs, boti, and chapli, perfect for sharing.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 3,500<small>/platter</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Chapli Kebab','1,600','https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=70" alt="Chapli Kebab" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Peshawari Chapli Kebab</div>
+            <div class="menu-card-desc">Authentic Peshawari-style minced meat patties with pomegranate seeds and tomatoes.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 1,600<small>/dozen</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Malai Boti','1,950','https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=70" alt="Malai Boti" loading="lazy"><div class="menu-card-badge">New</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Creamy Malai Boti</div>
+            <div class="menu-card-desc">Melt-in-your-mouth chicken cubes in a velvety cream marinade, grilled to perfection.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 1,950<small>/skewer</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAST FOOD -->
+    <div class="menu-panel" id="panel-fastfood">
+      <div class="menu-grid">
+        <div class="menu-card reveal" onclick="addToCart('Ember Signature Burger','990','https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=70" alt="Burger" loading="lazy"><div class="menu-card-badge">Signature</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Ember Signature Burger</div>
+            <div class="menu-card-desc">Double beef patty, caramelized onions, aged cheddar, and our secret ember sauce.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 990</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Crispy Zinger','750','https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=70" alt="Zinger" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Spicy Crispy Zinger</div>
+            <div class="menu-card-desc">Crispy fried chicken fillet with jalapeños, coleslaw and chipotle mayo.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 750</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Loaded Fries','550','https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=400&q=70" alt="Fries" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Loaded Masala Fries</div>
+            <div class="menu-card-desc">Crispy fries topped with spiced chicken, cheese sauce, and jalapeño relish.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 550</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Desi Shawarma','680','https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=70" alt="Shawarma" loading="lazy"><div class="menu-card-badge">Bestseller</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Desi Chicken Shawarma</div>
+            <div class="menu-card-desc">Freshly rolled shawarma with marinated chicken, garlic sauce, and pickled vegetables.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 680</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Cheese Pizza','1,200','https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=70" alt="Pizza" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">BBQ Chicken Pizza</div>
+            <div class="menu-card-desc">Smoky BBQ base, grilled chicken, red onions, and mozzarella on thin-crust base.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 1,200<small>/large</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Chicken Wings','950','https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=70" alt="Wings" loading="lazy"><div class="menu-card-badge">Hot</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Fiery Buffalo Wings</div>
+            <div class="menu-card-desc">Bone-in wings tossed in our signature ember buffalo sauce. 8 pieces per serving.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 950<small>/8pcs</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL -->
+    <div class="menu-panel" id="panel-continental">
+      <div class="menu-grid">
+        <div class="menu-card reveal" onclick="addToCart('Pasta Arrabbiata','1,100','https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=400&q=70" alt="Pasta" loading="lazy"><div class="menu-card-badge">Popular</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Pasta Arrabbiata</div>
+            <div class="menu-card-desc">Al dente penne in spicy tomato sauce with fresh basil and parmesan shavings.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 1,100</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Grilled Salmon','3,200','https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&q=70" alt="Salmon" loading="lazy"><div class="menu-card-badge">Premium</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Pan-Seared Salmon</div>
+            <div class="menu-card-desc">Atlantic salmon fillet with lemon butter sauce, seasonal greens, and truffle mash.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 3,200</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Caesar Salad','850','https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=70" alt="Salad" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Grilled Caesar Salad</div>
+            <div class="menu-card-desc">Romaine hearts, grilled chicken, house-made Caesar dressing, and crunchy croutons.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 850</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Beef Steak','2,900','https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1558030006-450675393462?w=400&q=70" alt="Steak" loading="lazy"><div class="menu-card-badge">Chef's Special</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Ember Beef Steak</div>
+            <div class="menu-card-desc">8oz sirloin steak, cooked to your preference, with mushroom jus and roasted vegetables.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 2,900</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRINKS -->
+    <div class="menu-panel" id="panel-drinks">
+      <div class="menu-grid">
+        <div class="menu-card reveal" onclick="addToCart('Fresh Lemonade','350','https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400&q=70" alt="Lemonade" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Mint Lemonade</div>
+            <div class="menu-card-desc">Fresh squeezed lemon with garden mint, chilled to perfection. A summer classic.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 350</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Mango Lassi','380','https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&q=70" alt="Lassi" loading="lazy"><div class="menu-card-badge">Seasonal</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Mango Lassi</div>
+            <div class="menu-card-desc">Thick, creamy yogurt drink blended with fresh Chaunsa mango pulp.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 380</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Cold Coffee','420','https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70" alt="Coffee" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Premium Cold Coffee</div>
+            <div class="menu-card-desc">Rich espresso blended with ice cream and cold milk. Topped with whipped cream.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 420</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Mocktail Punch','450','https://images.unsplash.com/photo-1596475543010-e6c92a8028db?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1596475543010-e6c92a8028db?w=400&q=70" alt="Mocktail" loading="lazy"><div class="menu-card-badge">Signature</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Ember Mocktail Punch</div>
+            <div class="menu-card-desc">House blend of tropical fruits, herbs, and sparkling water. Non-alcoholic delight.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 450</div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEALS -->
+    <div class="menu-panel" id="panel-deals">
+      <div class="menu-grid">
+        <div class="menu-card reveal" onclick="addToCart('Family BBQ Deal','5,999','https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70',this)" style="border-color:var(--gold-dark);">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70" alt="Family Deal" loading="lazy"><div class="menu-card-badge" style="background:var(--gold);color:var(--charcoal)">Save 30%</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Family BBQ Feast</div>
+            <div class="menu-card-desc">Seekh kebabs (1kg) + Chicken tikka (1kg) + Naan (10pcs) + Chutney + 4 drinks. Serves 4–6.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 5,999<small style="color:var(--text-dim);text-decoration:line-through;"> ₨8,500</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Couple Dinner','2,499','https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70" alt="Couple Deal" loading="lazy"><div class="menu-card-badge" style="background:var(--gold);color:var(--charcoal)">Save 20%</div></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Couple Dinner Special</div>
+            <div class="menu-card-desc">Continental main course for 2 + shared starter + 2 drinks + dessert. Perfect for date night.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 2,499<small style="color:var(--text-dim);text-decoration:line-through;"> ₨3,100</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+        <div class="menu-card reveal" onclick="addToCart('Office Lunch Box','1,800','https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=70',this)">
+          <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=70" alt="Office Deal" loading="lazy"></div>
+          <div class="menu-card-body">
+            <div class="menu-card-title serif">Office Lunch Deal (5)</div>
+            <div class="menu-card-desc">5 zinger burgers + 5 orders fries + 5 drinks. Bulk order discount. Free delivery.</div>
+            <div class="menu-card-footer"><div class="menu-card-price">₨ 1,800<small>/person</small></div><button class="add-to-cart-btn">+</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ORDER SECTION ===== -->
+<section id="order" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Quick & Easy</div>
+      <h2 class="section-title">Place Your <span class="gold serif" style="font-style:italic">Order</span></h2>
+      <p class="section-subtitle">Pre-order for dine-in or schedule a takeaway — we'll have it ready for you.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="loyalty-banner reveal">
+      <div class="loyalty-icon">👑</div>
+      <div>
+        <div class="loyalty-title serif">Ember Loyalty Program</div>
+        <div class="loyalty-desc">Earn 1 point per ₨10 spent. Redeem for free meals and exclusive discounts.</div>
+      </div>
+      <div class="loyalty-points">
+        <div class="loyalty-pts-num">0</div>
+        <div class="loyalty-pts-label">Points Earned</div>
+      </div>
+    </div>
+    <div class="order-type-selector reveal">
+      <button class="order-type-btn selected" onclick="selectOrderType(this,'dine')">
+        <div class="order-type-icon">🪑</div>
+        <div class="order-type-title serif">Dine-In Pre-Order</div>
+        <div class="order-type-desc">Select your table and time before arrival</div>
+      </button>
+      <button class="order-type-btn" onclick="selectOrderType(this,'takeaway')">
+        <div class="order-type-icon">🛍️</div>
+        <div class="order-type-title serif">Takeaway Order</div>
+        <div class="order-type-desc">Pick up at your convenience</div>
+      </button>
+      <button class="order-type-btn" onclick="selectOrderType(this,'delivery')">
+        <div class="order-type-icon">🏍️</div>
+        <div class="order-type-title serif">Home Delivery</div>
+        <div class="order-type-desc">Free delivery within 5km radius</div>
+      </button>
+    </div>
+    <div class="reveal" style="background:var(--charcoal-3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;">
+      <div class="order-form-grid">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="Ahmed Khan" id="order-name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" placeholder="+92 300 1234567" id="order-phone">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="order-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time Slot</label>
+          <select class="form-select form-input" id="order-time">
+            <option>12:00 PM – 1:00 PM</option>
+            <option>1:00 PM – 2:00 PM</option>
+            <option>7:00 PM – 8:00 PM</option>
+            <option>8:00 PM – 9:00 PM</option>
+            <option>9:00 PM – 10:00 PM</option>
+            <option>10:00 PM – 11:00 PM</option>
+          </select>
+        </div>
+        <div class="form-group full" id="table-select-group">
+          <label class="form-label">Select Table</label>
+          <div class="table-grid">
+            <button class="table-btn" onclick="selectTable(this)">T1</button>
+            <button class="table-btn" onclick="selectTable(this)">T2</button>
+            <button class="table-btn occupied">T3</button>
+            <button class="table-btn" onclick="selectTable(this)">T4</button>
+            <button class="table-btn" onclick="selectTable(this)">T5</button>
+            <button class="table-btn occupied">T6</button>
+            <button class="table-btn" onclick="selectTable(this)">T7</button>
+            <button class="table-btn" onclick="selectTable(this)">T8</button>
+            <button class="table-btn occupied">T9</button>
+            <button class="table-btn" onclick="selectTable(this)">T10</button>
+          </div>
+          <p style="font-size:0.72rem;color:var(--text-dim);margin-top:8px;">Greyed out = occupied. Click to reserve.</p>
+        </div>
+        <div class="form-group" id="address-group" style="display:none;">
+          <label class="form-label">Delivery Address</label>
+          <input type="text" class="form-input" placeholder="Block 5, Clifton, Karachi" id="order-address">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Special Instructions</label>
+          <textarea class="form-textarea form-input" placeholder="Any dietary requirements, allergies, or special requests..." id="order-notes"></textarea>
+        </div>
+      </div>
+      <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="placeOrder()">Confirm Order 🎉</button>
+        <button class="btn btn-ghost" onclick="toggleCart()">View Cart (₨<span id="order-btn-total">0</span>)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PAYMENT SECTION ===== -->
+<section id="payment" class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Secure Checkout</div>
+      <h2 class="section-title">Payment <span class="gold serif" style="font-style:italic">Methods</span></h2>
+      <p class="section-subtitle">Choose your preferred payment method. All transactions are 100% secure.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="reveal">
+      <div class="payment-methods">
+        <div class="payment-method selected" onclick="selectPayment(this,'card')">
+          <div class="payment-icon">💳</div>
+          <div class="payment-name">Credit / Debit Card</div>
+        </div>
+        <div class="payment-method" onclick="selectPayment(this,'cash')">
+          <div class="payment-icon">💵</div>
+          <div class="payment-name">Cash on Delivery</div>
+        </div>
+        <div class="payment-method" onclick="selectPayment(this,'wallet')">
+          <div class="payment-icon">📱</div>
+          <div class="payment-name">Mobile Wallet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card Details -->
+    <div id="payment-card" class="reveal">
+      <div class="card-details">
+        <div class="card-visual">
+          <div class="card-chip"></div>
+          <div class="card-number" id="card-num-display">•••• •••• •••• ••••</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-info-label">Card Holder</div>
+              <div class="card-info-value" id="card-holder-display">YOUR NAME</div>
+            </div>
+            <div>
+              <div class="card-info-label">Expires</div>
+              <div class="card-info-value" id="card-exp-display">MM/YY</div>
+            </div>
+          </div>
+        </div>
+        <div class="order-form-grid">
+          <div class="form-group full">
+            <label class="form-label">Card Number</label>
+            <input type="text" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" id="card-num" oninput="formatCard(this)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Card Holder Name</label>
+            <input type="text" class="form-input" placeholder="Ahmed Khan" id="card-holder" oninput="document.getElementById('card-holder-display').textContent=this.value||'YOUR NAME'">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expiry Date</label>
+            <input type="text" class="form-input" placeholder="MM/YY" maxlength="5" id="card-exp" oninput="document.getElementById('card-exp-display').textContent=this.value||'MM/YY'">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CVV</label>
+            <input type="password" class="form-input" placeholder="•••" maxlength="3">
+          </div>
+        </div>
+        <p class="security-badge">All payment data is encrypted with SSL 256-bit security</p>
+      </div>
+    </div>
+
+    <!-- Cash -->
+    <div id="payment-cash" style="display:none;" class="reveal">
+      <div class="card-details" style="text-align:center;padding:48px;">
+        <div style="font-size:3rem;margin-bottom:16px;">💵</div>
+        <h3 class="serif" style="font-size:1.5rem;margin-bottom:12px;">Cash on Delivery</h3>
+        <p style="color:var(--text-muted);font-size:0.9rem;max-width:400px;margin:0 auto;">Pay in cash when your order arrives or when you pick it up. No minimum order required.</p>
+        <div style="margin-top:24px;padding:16px;background:rgba(201,168,76,0.05);border:1px solid var(--border);border-radius:var(--radius);">
+          <p style="font-size:0.8rem;color:var(--text-muted);">Please keep exact change ready for faster service.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wallet -->
+    <div id="payment-wallet" style="display:none;" class="reveal">
+      <div class="wallet-options">
+        <div class="wallet-option wallet-easypaisa">
+          <div class="wallet-logo">EP</div>
+          <div>
+            <div style="font-weight:500;margin-bottom:4px;">EasyPaisa</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">0300-1234567</div>
+          </div>
+        </div>
+        <div class="wallet-option wallet-jazzcash">
+          <div class="wallet-logo">JC</div>
+          <div>
+            <div style="font-weight:500;margin-bottom:4px;">JazzCash</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">0300-1234567</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:20px;padding:20px;background:var(--charcoal-3);border:1px solid var(--border);border-radius:var(--radius);">
+        <label class="form-label" style="margin-bottom:10px;display:block;">Transaction ID</label>
+        <input type="text" class="form-input" placeholder="Enter your transaction reference number">
+        <p style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;">After payment, enter the reference number above to confirm your order.</p>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:28px;">
+      <button class="btn btn-gold" style="font-size:0.9rem;padding:16px 40px;" onclick="finalizePayment()">
+        🔒 Pay Securely — ₨ <span id="pay-total">0</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESERVATION ===== -->
+<section id="reservation" class="section">
+  <div class="container">
+    <div class="reservation-grid">
+      <div class="reveal-left">
+        <div class="section-label">Reserve Your Spot</div>
+        <h2 class="section-title">Book a <span class="gold serif" style="font-style:italic">Table</span></h2>
+        <p class="section-subtitle" style="margin-bottom:40px;">Experience an unforgettable dining journey. We'll ensure everything is perfect for your arrival.</p>
+        <div class="order-form-grid" style="gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" placeholder="Ahmed Khan">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-input" placeholder="+92 300 1234567">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <select class="form-select form-input">
+              <option>7:00 PM</option><option>7:30 PM</option><option>8:00 PM</option>
+              <option>8:30 PM</option><option>9:00 PM</option><option>9:30 PM</option><option>10:00 PM</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label" style="margin-bottom:12px;display:block;">Number of Guests</label>
+            <div class="guest-selector">
+              <button class="guest-btn" onclick="changeGuests(-1)">−</button>
+              <div class="guest-count" id="guest-count">2</div>
+              <button class="guest-btn" onclick="changeGuests(1)">+</button>
+              <span style="font-size:0.82rem;color:var(--text-muted);">guests</span>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Special Occasion</label>
+            <select class="form-select form-input">
+              <option>None</option><option>Birthday</option><option>Anniversary</option>
+              <option>Business Dinner</option><option>Family Gathering</option><option>Proposal 💍</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-gold" style="margin-top:24px;" onclick="bookTable()">Confirm Reservation 📅</button>
+      </div>
+      <div class="reservation-visual reveal-right">
+        <div class="reservation-img-wrap">
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Restaurant Interior">
+        </div>
+        <div class="reservation-overlay">
+          <div class="reservation-overlay-title">✨ Currently Available</div>
+          <div class="reservation-overlay-detail">12 tables · Opens at 12 PM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about" class="section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal-left">
+        <div class="about-images">
+          <div class="about-img-main">
+            <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=700&q=80" alt="Chef at work">
+          </div>
+          <div class="about-img-sm">
+            <img src="https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=400&q=70" alt="Ingredients">
+          </div>
+          <div class="about-img-sm">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=70" alt="Dining room">
+          </div>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <div class="section-label">Our Story</div>
+        <h2 class="section-title">Born from <span class="gold serif" style="font-style:italic">Flame</span> & Heritage</h2>
+        <div class="divider"></div>
+        <p style="color:var(--text-muted);font-size:0.92rem;line-height:1.8;margin-bottom:20px;">
+          Founded in 2012 in the heart of Karachi, Ember & Spice was born from a passion for authentic flavors and an obsession with culinary craft. What started as a family BBQ spot has grown into one of Karachi's most beloved multi-cuisine destinations.
+        </p>
+        <p style="color:var(--text-muted);font-size:0.92rem;line-height:1.8;margin-bottom:32px;">
+          Our Head Chef, <strong style="color:var(--text)">Ustad Rashid Khan</strong>, brings 25+ years of culinary expertise — mastering traditional Desi techniques while seamlessly blending continental finesse. Every dish is crafted with premium ingredients, sourced fresh daily.
+        </p>
+        <div class="about-features">
+          <div class="about-feature">
+            <div class="about-feature-icon">🔥</div>
+            <div class="about-feature-title serif">Charcoal Grilled</div>
+            <div class="about-feature-desc">Traditional charcoal for authentic smoky flavor in every BBQ item.</div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">🌿</div>
+            <div class="about-feature-title serif">Fresh Daily</div>
+            <div class="about-feature-desc">Ingredients sourced from local farms every morning before service.</div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">👨‍🍳</div>
+            <div class="about-feature-title serif">Master Chefs</div>
+            <div class="about-feature-desc">A team of 8 specialized chefs, each an expert in their cuisine.</div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">🏆</div>
+            <div class="about-feature-title serif">Award Winning</div>
+            <div class="about-feature-desc">Best BBQ Restaurant in Karachi — Foodies Choice Awards 2023.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REVIEWS ===== -->
+<section id="reviews" class="section">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:60px;">
+      <div class="section-label" style="justify-content:center;">
+        <span></span>Guest Experiences<span style="width:30px;height:1px;background:var(--gold);display:inline-block;margin-left:12px;"></span>
+      </div>
+      <h2 class="section-title">What Our <span class="gold serif" style="font-style:italic">Guests</span> Say</h2>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;">
+        <span style="color:var(--gold);font-size:1.1rem;">★★★★★</span>
+        <span style="font-family:var(--font-serif);font-size:1.1rem;color:var(--text-muted);">4.9 / 5 from 2,400+ reviews</span>
+      </div>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">The Seekh Kebabs are absolutely legendary. I've traveled across Pakistan and nothing compares. The charcoal flavor is incomparable. A truly world-class experience right here in Karachi.</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">AK</div>
+          <div>
+            <div class="reviewer-name">Ahmed Khalid</div>
+            <div class="reviewer-date">April 2025</div>
+          </div>
+          <div class="review-platform">Google</div>
+        </div>
+      </div>
+      <div class="review-card reveal" style="animation-delay:0.1s">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Celebrated our anniversary here and the staff went above and beyond. The Continental section is surprisingly excellent — the salmon was cooked to perfection. Will definitely return!</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">SR</div>
+          <div>
+            <div class="reviewer-name">Sana Rehman</div>
+            <div class="reviewer-date">March 2025</div>
+          </div>
+          <div class="review-platform">TripAdvisor</div>
+        </div>
+      </div>
+      <div class="review-card reveal" style="animation-delay:0.2s">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">The online ordering system is seamless. I pre-ordered for dine-in and everything was ready exactly when we arrived. The Family BBQ Deal is incredible value — we order it every Friday.</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">MH</div>
+          <div>
+            <div class="reviewer-name">Mohsin Hassan</div>
+            <div class="reviewer-date">February 2025</div>
+          </div>
+          <div class="review-platform">Instagram</div>
+        </div>
+      </div>
+      <div class="review-card reveal" style="animation-delay:0.15s">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Ember & Spice isn't just a restaurant, it's an experience. The ambiance, the service, the food — everything is premium. The mint lemonade alone is worth the visit.</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">FA</div>
+          <div>
+            <div class="reviewer-name">Fatima Akhtar</div>
+            <div class="reviewer-date">January 2025</div>
+          </div>
+          <div class="review-platform">Google</div>
+        </div>
+      </div>
+      <div class="review-card reveal" style="animation-delay:0.25s">
+        <div class="review-stars">★★★★☆</div>
+        <p class="review-text">Best place for a corporate dinner in Karachi. The private dining setup, attentive staff, and diverse menu options make it perfect for hosting clients. Our team loves the chapli kebabs.</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">ZM</div>
+          <div>
+            <div class="reviewer-name">Zara Malik</div>
+            <div class="reviewer-date">December 2024</div>
+          </div>
+          <div class="review-platform">Facebook</div>
+        </div>
+      </div>
+      <div class="review-card reveal" style="animation-delay:0.3s">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">The Malai Boti is the most tender piece of chicken I've ever tasted. Melts on the tongue. The restaurant is always packed on weekends — reserve in advance. Absolutely magnificent.</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">BI</div>
+          <div>
+            <div class="reviewer-name">Bilal Ijaz</div>
+            <div class="reviewer-date">November 2024</div>
+          </div>
+          <div class="review-platform">Zomato</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LOCATION ===== -->
+<section id="location" class="section">
+  <div class="container">
+    <div class="reveal" style="margin-bottom:60px;">
+      <div class="section-label">Find Us</div>
+      <h2 class="section-title">Visit <span class="gold serif" style="font-style:italic">Ember & Spice</span></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="location-grid">
+      <div class="location-info reveal-left">
+        <div class="location-detail">
+          <div class="location-icon">📍</div>
+          <div class="location-detail-text">
+            <strong>Address</strong>
+            <span>Plot 45, Block 5, Clifton<br>Karachi, Sindh, Pakistan</span>
+          </div>
+        </div>
+        <div class="location-detail">
+          <div class="location-icon">📞</div>
+          <div class="location-detail-text">
+            <strong>Phone & WhatsApp</strong>
+            <span>+92 300 123 4567<br>+92 21 3456 7890</span>
+          </div>
+        </div>
+        <div class="location-detail">
+          <div class="location-icon">🕐</div>
+          <div class="location-detail-text">
+            <strong>Working Hours</strong>
+            <span>Mon – Thu: 12PM – 11PM<br>Fri – Sun: 12PM – 12AM<br>Open on all holidays</span>
+          </div>
+        </div>
+        <div class="location-detail">
+          <div class="location-icon">📧</div>
+          <div class="location-detail-text">
+            <strong>Email</strong>
+            <span>hello@emberandspice.pk<br>reservations@emberandspice.pk</span>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <a href="https://wa.me/923001234567" target="_blank" class="btn btn-gold">
+            💬 WhatsApp Us Now
+          </a>
+        </div>
+      </div>
+      <div class="map-container reveal-right">
+        <div class="map-placeholder">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3618.9!2d67.0311!3d24.8607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb33e7b4da18b37%3A0x9cf92a439eb4a5b3!2sClifton%2C%20Karachi%2C%20Karachi%20City%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="nav-logo" style="margin-bottom:16px;">
+          <span class="nav-logo-main" style="font-size:1.5rem;">EMBER & SPICE</span>
+          <span class="nav-logo-sub" style="margin-top:4px;">Desi BBQ · Fast Food · Continental</span>
+        </div>
+        <p class="footer-brand-desc">Where every flame tells a story. Authentic flavors, premium ingredients, and unforgettable dining experiences in the heart of Karachi since 2012.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" title="Instagram">📸</a>
+          <a href="#" class="social-link" title="Facebook">📘</a>
+          <a href="#" class="social-link" title="Twitter">🐦</a>
+          <a href="#" class="social-link" title="TikTok">🎵</a>
+          <a href="#" class="social-link" title="YouTube">▶️</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <div class="footer-links">
+          <a href="#menu">Menu</a>
+          <a href="#order">Order Online</a>
+          <a href="#reservation">Reservations</a>
+          <a href="#about">About Us</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#location">Location</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Policies</div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Refund Policy</a>
+          <a href="#">Allergen Info</a>
+          <a href="#">Halal Certified</a>
+          <a href="#">Careers</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Newsletter</div>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">Get exclusive deals, seasonal menus, and special offers delivered to your inbox.</p>
+        <div class="newsletter-form">
+          <input class="newsletter-input" type="email" placeholder="your@email.com">
+          <button class="btn btn-gold btn-sm" onclick="subscribeNewsletter()">Subscribe →</button>
+        </div>
+        <p style="font-size:0.7rem;color:var(--text-dim);margin-top:10px;">No spam, unsubscribe anytime.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Ember & Spice. All rights reserved. Karachi, Pakistan.</p>
+      <p class="footer-made">Crafted with <span>♥</span> for food lovers</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ===== STATE =====
+let cart = [];
+let guestCount = 2;
+let currentPayment = 'card';
+let discountApplied = false;
+let orderType = 'dine';
+let loyaltyPoints = 0;
+
+// ===== NAVBAR SCROLL =====
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ===== MOBILE NAV =====
+function toggleMobileNav() {
+  document.getElementById('mobile-nav').classList.toggle('open');
+}
+
+// ===== HERO SLIDER =====
+let heroSlide = 0;
+const slides = document.querySelectorAll('.hero-slide');
+setInterval(() => {
+  slides[heroSlide].classList.remove('active');
+  heroSlide = (heroSlide + 1) % slides.length;
+  slides[heroSlide].classList.add('active');
+}, 4000);
+
+// ===== MENU TABS =====
+function switchTab(tab, btn) {
+  document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  btn.classList.add('active');
+  // Re-trigger reveal for new panel items
+  setTimeout(observeReveal, 50);
+}
+
+// ===== CART =====
+function toggleCart() {
+  const sidebar = document.getElementById('cart-sidebar');
+  const overlay = document.getElementById('overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('visible');
+}
+function closeCart() {
+  document.getElementById('cart-sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('visible');
+}
+
+function addToCart(name, price, img, card) {
+  const priceNum = parseInt(price.replace(/,/g, ''));
+  const existing = cart.find(i => i.name === name);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ name, price: priceNum, img, qty: 1 });
+  }
+  // Visual feedback
+  const btn = card ? card.querySelector('.add-to-cart-btn') : null;
+  if (btn) {
+    btn.classList.add('added');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('added'); btn.textContent = '+'; }, 1200);
+  }
+  updateCart();
+  showToast('✓', name + ' added to cart!');
+  loyaltyPoints += Math.floor(priceNum / 10);
+  document.querySelector('.loyalty-pts-num').textContent = loyaltyPoints;
+}
+
+function updateCart() {
+  const list = document.getElementById('cart-items-list');
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const countEl = document.getElementById('cart-count');
+
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const discount = discountApplied ? Math.floor(total * 0.2) : 0;
+  const finalTotal = total - discount;
+
+  countEl.textContent = cart.reduce((s, i) => s + i.qty, 0);
+  countEl.classList.toggle('visible', cart.length > 0);
+
+  if (cart.length === 0) {
+    empty.style.display = 'block'; footer.style.display = 'none'; return;
+  }
+  empty.style.display = 'none'; footer.style.display = 'block';
+
+  // Remove old items (keep empty div)
+  list.querySelectorAll('.cart-item').forEach(el => el.remove());
+
+  cart.forEach((item, idx) => {
+    const el = document.createElement('div');
+    el.className = 'cart-item';
+    el.innerHTML = `
+      <img class="cart-item-img" src="${item.img}" alt="${item.name}">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">₨ ${(item.price * item.qty).toLocaleString()}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+          <button class="cart-remove" onclick="removeItem(${idx})">Remove</button>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  document.getElementById('cart-subtotal-val').textContent = '₨ ' + total.toLocaleString();
+  document.getElementById('cart-total-val').textContent = '₨ ' + finalTotal.toLocaleString();
+  document.getElementById('order-btn-total').textContent = finalTotal.toLocaleString();
+  document.getElementById('pay-total').textContent = finalTotal.toLocaleString();
+
+  if (discountApplied) {
+    document.getElementById('cart-discount').style.display = 'flex';
+    document.getElementById('discount-amount').textContent = '-₨ ' + discount.toLocaleString();
+  }
+}
+
+function changeQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  updateCart();
+}
+function removeItem(idx) {
+  cart.splice(idx, 1);
+  updateCart();
+}
+function applyCoupon() {
+  const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+  if (code === 'EMBER20' && !discountApplied) {
+    discountApplied = true;
+    showToast('🎉', 'Coupon applied! 20% discount unlocked');
+    updateCart();
+  } else if (discountApplied) {
+    showToast('ℹ️', 'Coupon already applied');
+  } else {
+    showToast('❌', 'Invalid coupon code');
+  }
+}
+
+// ===== ORDER TYPE =====
+function selectOrderType(btn, type) {
+  orderType = type;
+  document.querySelectorAll('.order-type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('table-select-group').style.display = type === 'dine' ? 'flex' : 'none';
+  document.getElementById('address-group').style.display = type === 'delivery' ? 'flex' : 'none';
+}
+
+// ===== TABLE =====
+function selectTable(btn) {
+  if (btn.classList.contains('occupied')) return;
+  document.querySelectorAll('.table-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// ===== RESERVATION =====
+function changeGuests(delta) {
+  guestCount = Math.max(1, Math.min(20, guestCount + delta));
+  document.getElementById('guest-count').textContent = guestCount;
+}
+
+function bookTable() {
+  showToast('📅', 'Reservation confirmed! Check your phone for confirmation.');
+  const btn = event.target;
+  btn.textContent = '✓ Reserved!';
+  btn.style.background = 'linear-gradient(135deg,#4ade80,#22c55e)';
+  setTimeout(() => { btn.textContent = 'Confirm Reservation 📅'; btn.style.background = ''; }, 3000);
+}
+
+// ===== ORDER =====
+function placeOrder() {
+  if (cart.length === 0) { showToast('⚠️', 'Add items to your cart first!'); return; }
+  showToast('🎉', 'Order placed! Preparing your meal...');
+  document.getElementById('order-status').classList.add('visible');
+  animateOrderStatus();
+  toggleCart();
+  setTimeout(() => document.getElementById('payment').scrollIntoView({ behavior: 'smooth' }), 500);
+}
+
+function animateOrderStatus() {
+  const steps = ['step-received', 'step-preparing', 'step-ready'];
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('completed', 'active');
+      if (i > 0) document.getElementById(steps[i-1]).classList.remove('active');
+      if (i === steps.length - 1) showToast('✅', 'Your order is ready!');
+    }, i * 2500);
+  });
+}
+
+// ===== PAYMENT =====
+function selectPayment(el, type) {
+  currentPayment = type;
+  document.querySelectorAll('.payment-method').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('payment-card').style.display = type === 'card' ? 'block' : 'none';
+  document.getElementById('payment-cash').style.display = type === 'cash' ? 'block' : 'none';
+  document.getElementById('payment-wallet').style.display = type === 'wallet' ? 'block' : 'none';
+}
+
+function formatCard(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 16);
+  v = v.replace(/(.{4})/g, '$1 ').trim();
+  input.value = v;
+  const masked = v.substring(0, 14) + (v.length > 14 ? v.slice(-2) : '');
+  document.getElementById('card-num-display').textContent = v || '•••• •••• •••• ••••';
+}
+
+function scrollToPayment() {
+  closeCart();
+  setTimeout(() => document.getElementById('payment').scrollIntoView({ behavior: 'smooth' }), 300);
+}
+
+function finalizePayment() {
+  if (cart.length === 0) { showToast('⚠️', 'Your cart is empty!'); return; }
+  showToast('✅', 'Payment successful! Thank you for your order.');
+  cart = [];
+  discountApplied = false;
+  updateCart();
+  setTimeout(() => {
+    document.getElementById('cart-count').classList.remove('visible');
+  }, 500);
+}
+
+// ===== TOAST =====
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.querySelector('.toast-icon').textContent = icon;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ===== NEWSLETTER =====
+function subscribeNewsletter() {
+  showToast('📧', 'You\'re subscribed! Welcome to Ember & Spice.');
+}
+
+// ===== SCROLL REVEAL =====
+function observeReveal() {
+  const els = document.querySelectorAll('.reveal:not(.revealed), .reveal-left:not(.revealed), .reveal-right:not(.revealed)');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('revealed'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => obs.observe(el));
+}
+observeReveal();
+
+// Set min date to today
+const today = new Date().toISOString().split('T')[0];
+document.querySelectorAll('input[type="date"]').forEach(i => i.min = today);
+</script>
+</body>
+</html>
